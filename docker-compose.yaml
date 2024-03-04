@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  oracle:
+    profiles:
+      - oracle
+    image: crosig/oracle
+    build:
+      dockerfile: Dockerfile
+      context: ./docker/oracle
+    shm_size: '3gb'
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      - ORACLE_PWD=1234
+      - ORACLE_EDITION=standard
+      - ORACLE_CHARACTERSET=WE8MSWIN1252
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+
+  mysql:
+    image: crosig/mysql
+    build:
+      dockerfile: Dockerfile
+      context: ./docker/mysql
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      - MYSQL_DATABASE=lportal
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/opt/oracle/oradata
+
+  search:
+    profiles:
+      - elasticsearch
+    image: crosig/elasticsearch
+    build:
+      dockerfile: ./Dockerfile
+      context: ./docker/elasticsearch
+    environment:
+      - cluster.name=liferay_cluster
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
+      - "node.name=es-node1"
+    volumes:
+      - elastic_state:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  kibana:
+    profiles:
+      - elasticsearch
+    image: kibana:7.17.10
+    environment:
+      - ELASTICSEARCH_HOSTS=http://search:9200
+    ports:
+      - "5601:5601"
+
+  liferay:
+    image: crosig/liferay
+    deploy:
+      resources:
+        limits:
+          cpus: '8'
+    build: 
+      dockerfile: Dockerfile
+      context: build/docker
+    environment:
+      - LIFERAY_JVM_OPTS=-Xms4g -Xmx6g
+      - LIFERAY_JPDA_ENABLED=true
+      - LIFERAY_DISABLE_TRIAL_LICENSE=true
+      - LIFERAY_MODULE_PERIOD_FRAMEWORK_PERIOD_PROPERTIES_PERIOD_OSGI_PERIOD_CONSOLE=0.0.0.0:11311
+      - LIFERAY_DATABASE_PERIOD_INDEXES_PERIOD_UPDATE_PERIOD_ON_PERIOD_STARTUP=true
+      - LIFERAY_UPGRADE_PERIOD_DATABASE_PERIOD_AUTO_PERIOD_RUN=true
+      - LIFERAY_SESSION_PERIOD_TIMEOUT=120
+      - LIFERAY_VIRTUAL_PERIOD_HOSTS_PERIOD_VALID_PERIOD_HOSTS=*
+      - LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_USERNAME=${DB_USER}
+      - LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_PASSWORD=${DB_PASSWORD}
+      - LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_URL=${DB_HOST}
+      - LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_DRIVER_UPPERCASEC_LASS_UPPERCASEN_AME=${DB_JDBC}
+      - LIFERAY_RETRY_PERIOD_JDBC_PERIOD_ON_PERIOD_STARTUP_PERIOD_DELAY=${DB_RETRIES_DELAY}
+      - LIFERAY_RETRY_PERIOD_JDBC_PERIOD_ON_PERIOD_STARTUP_PERIOD_MAX_PERIOD_RETRIES=${DB_RETRIES_MAX}
+      - LIFERAY_INDEX_PERIOD_ON_PERIOD_STARTUP=true
+      - LIFERAY_FEATURE_PERIOD_FLAG_PERIOD__UPPERCASEL__UPPERCASEP__UPPERCASES__MINUS__NUMBER1__NUMBER6__NUMBER5__NUMBER4__NUMBER8__NUMBER2_=true
+      - LIFERAY_FEATURE_PERIOD_FLAG_PERIOD__UPPERCASEC__UPPERCASEO__UPPERCASEM__UPPERCASEM__UPPERCASEE__UPPERCASER__UPPERCASEC__UPPERCASEE__MINUS__NUMBER8__NUMBER0__NUMBER8__NUMBER7_=true
+    ports:
+      - "8080:8080"
+      - "11311:11311"
+      - "8000:8000"
+    volumes:
+      - liferay_document_library:/opt/liferay/data/document_library
+      - liferay_hypersonic:/opt/liferay/data/hypersonic
+  
+  spring:
+    profiles: 
+      - spring
+    image: crosig/spring
+    build: 
+      dockerfile: Dockerfile
+      context: client-extensions/task-manager-api
+    ports:
+      - "8081:8081"
+      - "5005:5005"
+    environment:
+      - JAVA_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+    extra_hosts:
+      - "iltest.crosig.group:10.0.3.232"
+
+volumes:
+  liferay_document_library:
+  liferay_hypersonic:
+  elastic_state:
+  oracle_data:
+  mysql_data:
