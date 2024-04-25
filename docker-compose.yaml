@@ -37,10 +37,9 @@ services:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASSWORD}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE --lower-case-table-names=0
     ports:
       - "3306:3306"
-    volumes:
-      - mysql_data:/opt/oracle/oradata
 
   search:
     profiles:
@@ -104,24 +103,8 @@ services:
       - liferay_document_library:/opt/liferay/data/document_library
       - liferay_hypersonic:/opt/liferay/data/hypersonic
   
-  spring:
-    profiles: 
-      - spring
-    image: crosig/spring
-    build: 
-      dockerfile: Dockerfile
-      context: client-extensions/task-manager-api
-    ports:
-      - "8081:8081"
-      - "5005:5005"
-    environment:
-      - JAVA_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
-    extra_hosts:
-      - "iltest.crosig.group:10.0.3.232"
-
 volumes:
   liferay_document_library:
   liferay_hypersonic:
   elastic_state:
   oracle_data:
-  mysql_data:

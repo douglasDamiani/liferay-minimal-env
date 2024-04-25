@@ -1,1 +1,7 @@
-// Check GETTING_STARTED.markdown for information regarding usage.
+apply from: 'gradle/crosig-docker-compose.gradle'
+
+apply plugin: "com.liferay.node"
+
+node {
+	nodeVersion = "16.15.1"
+}
