@@ -24,7 +24,7 @@ services:
       - oracle_data:/opt/oracle/oradata
 
   mysql:
-    image: crosig/mysql
+    image: mysql
     build:
       dockerfile: Dockerfile
       context: ./docker/mysql
@@ -38,8 +38,30 @@ services:
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASSWORD}
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE --lower-case-table-names=0
+    volumes:
+      - mysql_data:/var/lib/mysql
     ports:
       - "3306:3306"
+
+  mysql2:
+    profiles:
+      - liferay2
+    image: mysql2
+    build:
+      dockerfile: Dockerfile
+      context: ./docker/mysql2
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      - MYSQL_DATABASE=lportal
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD2}
+      - MYSQL_USER=${DB_USER2}
+      - MYSQL_PASSWORD=${DB_PASSWORD2}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE --lower-case-table-names=0
+    ports:
+      - "3906:3306"
 
   search:
     profiles:
@@ -69,7 +91,7 @@ services:
       - "5601:5601"
 
   liferay:
-    image: crosig/liferay
+    image: liferay
     deploy:
       resources:
         limits:
@@ -103,8 +125,48 @@ services:
       - liferay_document_library:/opt/liferay/data/document_library
       - liferay_hypersonic:/opt/liferay/data/hypersonic
   
+  liferay2:
+    profiles:
+      - liferay2
+    image: liferay2
+    deploy:
+      resources:
+        limits:
+          cpus: '8'
+    build: 
+      dockerfile: Dockerfile
+      context: build/docker
+    environment:
+      - LIFERAY_JVM_OPTS=-Xms4g -Xmx6g
+      - LIFERAY_JPDA_ENABLED=true
+      - LIFERAY_DISABLE_TRIAL_LICENSE=true
+      - LIFERAY_MODULE_PERIOD_FRAMEWORK_PERIOD_PROPERTIES_PERIOD_OSGI_PERIOD_CONSOLE=0.0.0.0:11311
+      - LIFERAY_DATABASE_PERIOD_INDEXES_PERIOD_UPDATE_PERIOD_ON_PERIOD_STARTUP=true
+      - LIFERAY_UPGRADE_PERIOD_DATABASE_PERIOD_AUTO_PERIOD_RUN=true
+      - LIFERAY_SESSION_PERIOD_TIMEOUT=120
+      - LIFERAY_VIRTUAL_PERIOD_HOSTS_PERIOD_VALID_PERIOD_HOSTS=*
+      - LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_USERNAME=${DB_USER2}
+      - LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_PASSWORD=${DB_PASSWORD2}
+      - LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_URL=${DB_HOST2}
+      - LIFERAY_JDBC_PERIOD_DEFAULT_PERIOD_DRIVER_UPPERCASEC_LASS_UPPERCASEN_AME=${DB_JDBC2}
+      - LIFERAY_RETRY_PERIOD_JDBC_PERIOD_ON_PERIOD_STARTUP_PERIOD_DELAY=${DB_RETRIES_DELAY2}
+      - LIFERAY_RETRY_PERIOD_JDBC_PERIOD_ON_PERIOD_STARTUP_PERIOD_MAX_PERIOD_RETRIES=${DB_RETRIES_MAX2}
+      - LIFERAY_INDEX_PERIOD_ON_PERIOD_STARTUP=true
+    ports:
+      - "9090:8080"
+      - "9000:8000"
+
+  smtp:
+    profiles:
+      - smtp
+    image: gessnerfl/fake-smtp-server
+    ports:
+      - "5080:8080"  # Interface web do servidor
+      - "5081:8081"  # http management api
+      - "8025:8025"  # Porta SMTP para envio de emails (pode ser alterada)
 volumes:
   liferay_document_library:
   liferay_hypersonic:
   elastic_state:
+  mysql_data:
   oracle_data:
