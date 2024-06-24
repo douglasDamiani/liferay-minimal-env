@@ -42,6 +42,12 @@ services:
       - mysql_data:/var/lib/mysql
     ports:
       - "3306:3306"
+    healthcheck:
+      test: mysql --protocol=socket -hlocalhost -uroot -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1'
+      interval: 30s
+      retries: 60
+      timeout: 10s
+      start_period: 10s
 
   search:
     image: liferay/elasticsearch
@@ -101,7 +107,12 @@ services:
       - "8000:8000"
     volumes:
       - liferay_document_library:/opt/liferay/data/document_library
-      - liferay_hypersonic:/opt/liferay/data/hypersonic
+    depends_on:
+      mysql:
+        condition: service_healthy
+      search:
+        condition: service_started
+
   
   liferay2:
     profiles:
@@ -164,7 +175,6 @@ services:
       - "8025:8025"  # Porta SMTP para envio de emails (pode ser alterada)
 volumes:
   liferay_document_library:
-  liferay_hypersonic:
   mysql_data:
   oracle_data:
   elastic_state:
