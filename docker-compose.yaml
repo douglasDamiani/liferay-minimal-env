@@ -24,7 +24,7 @@ services:
       - oracle_data:/opt/oracle/oradata
 
   mysql:
-    image: mysql
+    image: liferay/mysql
     build:
       dockerfile: Dockerfile
       context: ./docker/mysql
@@ -43,30 +43,8 @@ services:
     ports:
       - "3306:3306"
 
-  mysql2:
-    profiles:
-      - liferay2
-    image: mysql2
-    build:
-      dockerfile: Dockerfile
-      context: ./docker/mysql2
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-    environment:
-      - MYSQL_DATABASE=lportal
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD2}
-      - MYSQL_USER=${DB_USER2}
-      - MYSQL_PASSWORD=${DB_PASSWORD2}
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE --lower-case-table-names=0
-    ports:
-      - "3906:3306"
-
   search:
-    profiles:
-      - elasticsearch
-    image: crosig/elasticsearch
+    image: liferay/elasticsearch
     build:
       dockerfile: ./Dockerfile
       context: ./docker/elasticsearch
@@ -91,7 +69,7 @@ services:
       - "5601:5601"
 
   liferay:
-    image: liferay
+    image: liferay/liferay
     deploy:
       resources:
         limits:
@@ -156,6 +134,26 @@ services:
       - "9090:8080"
       - "9000:8000"
 
+  mysql2:
+    profiles:
+      - liferay2
+    image: mysql2
+    build:
+      dockerfile: Dockerfile
+      context: ./docker/mysql2
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      - MYSQL_DATABASE=lportal
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD2}
+      - MYSQL_USER=${DB_USER2}
+      - MYSQL_PASSWORD=${DB_PASSWORD2}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --character-set-client-handshake=FALSE --lower-case-table-names=0
+    ports:
+      - "3906:3306"
+
   smtp:
     profiles:
       - smtp
@@ -167,6 +165,6 @@ services:
 volumes:
   liferay_document_library:
   liferay_hypersonic:
-  elastic_state:
   mysql_data:
   oracle_data:
+  elastic_state:
