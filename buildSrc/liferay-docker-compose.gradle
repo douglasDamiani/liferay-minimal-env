@@ -1,0 +1,88 @@
+
+def currentProperties = loadLocalPropertiesIfExists()
+def currentProfiles = currentProperties.getProperty('dc.profiles')?.split(',') ?: [""]
+
+tasks.register('dcinit', DockerComposeInitTask) { 
+    group = 'Crosig Docker Compose'
+    description = 'Build project and start and build Docker Compose.'
+	profiles = currentProfiles
+}
+
+tasks.register('dcup', DockerComposeUpTask) { 
+    group = 'Crosig Docker Compose'
+    description = 'Run Docker Compose and Build Docker Images.'
+	profiles = currentProfiles
+}
+
+tasks.register('dcstart', DockerComposeStartTask) {
+    group = 'Crosig Docker Compose'
+    description = 'Start Docker Compose Services.'
+	profiles = currentProfiles
+}
+
+tasks.register('dcstop', DockerComposeStopTask) { 
+    group = 'Crosig Docker Compose'
+    description = 'Stop Docker Compose Services.'
+	profiles = currentProfiles
+}
+
+tasks.register('dcdown', DockerComposeDownTask) {
+    group = 'Crosig Docker Compose'
+    description = 'Stop and Remove Docker Compose Containers.'
+	profiles = currentProfiles
+}
+
+tasks.register('createdump', GenerateDumpMySQL) {
+    group = 'Crosig Docker Compose'
+    description = 'Remove old dump files and create a new one'
+}
+
+def loadLocalPropertiesIfExists() {
+  
+    def propertiesFileLocal = file('local.properties') 
+    def myProperties = new Properties()
+
+    if (propertiesFileLocal.exists()) {
+        myProperties.load(propertiesFileLocal.newDataInputStream())
+    }
+
+    return myProperties
+}
+
+subprojects { 
+
+	def containsModuleFiles = false
+
+	if (project.name == "poshi"){
+		return
+	}
+
+	def files = fileTree(projectDir).matching{ exclude { details -> details.directory } }.files
+	files.each { file -> 
+		if(file.name.contains("package.json") || file.name.contains("client-extension.yaml") || file.name.contains("build.gradle") ) { 
+			containsModuleFiles = true
+		} 
+    }
+
+	if(containsModuleFiles){
+		task dcDeploy(dependsOn: 'deploy'){
+			doLast() {
+				if(file("client-extension.yaml").exists()) { 
+					println "${project.name}"
+
+					fileTree(dir: "${project.projectDir}/dist").visit { FileVisitDetails details ->
+						project.exec {
+							commandLine 'docker', "compose", "-f", "${project.rootDir}/docker-compose.yaml", 'cp', details.file.path, "liferay:/opt/liferay/deploy/"
+						}
+					}
+				} else {
+					fileTree(dir: "${project.projectDir}/build/libs").visit { FileVisitDetails details ->
+						project.exec {
+							commandLine 'docker', "compose", "-f", "${project.rootDir}/docker-compose.yaml", 'cp', details.file.path, "liferay:/opt/liferay/deploy/"
+						}
+					}
+				}
+			}
+		}
+	}
+}

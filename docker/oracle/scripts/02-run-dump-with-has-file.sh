@@ -1,21 +1,24 @@
 echo "02-run-dump-with-has-file.sh"
 
-folder_path="/opt/oracle/admin/ORCLCDB/dpdump/"
+# folder_import_dump_path="/opt/oracle/admin/ORCLCDB/dpdump/"
+# folder_dump_file_path="/dump/"
 
-cp /dump/* "$folder_path"
+# first_dmp_file=""
+# ls "$folder_dump_file_path"/*.dmp 2>/dev/null | while read -r file; do
+#     first_dmp_file="$file"
+#     break
+# done
 
-# get Files inside of path in $folder_path and get only the first with extension .dmp 
-first_dmp_file=$(find "$folder_path" -type f -name "*.dmp" -print -quit)
+# if [ -n "$first_dmp_file" ]; then
+#     cp -P /dump/* "$folder_import_dump_path"
+#     # # get File name
+#     file_name="${first_dmp_file[0]}"
 
-if [ -n "$first_dmp_file" ]; then
-    # get File name
-    file_name=$(basename "$first_dmp_file")
-
-    echo "file with .dmp found in: $first_dmp_file / name: $file_name"
-    impdp SYSTEM/1234@localhost:1521/ORCLCDB DUMPFILE="$file_name" SCHEMAS=LPORTAL
-else
-    echo "No .dmp files found in the specified folder."
-fi
+#     echo "file with .dmp found in: $first_dmp_file / name: $file_name"
+#     impdp SYSTEM/1234@localhost:1521/ORCLCDB DUMPFILE="$file_name" SCHEMAS=LPORTAL
+# else
+#     echo "No .dmp files found in the specified folder."
+# fi
 
 
 

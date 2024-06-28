@@ -1,10 +1,21 @@
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
+import org.gradle.api.tasks.Input
 
 class DockerComposeStartTask extends DefaultTask {
-    @Option(option = "profiles", description = "Docker compose profiles default value is spring")
+
     List<String> profiles = []
+
+    @Option(option = "profiles", description = "Docker compose profiles default value is spring")
+    public void setProfiles(List<String> profiles) {
+        this.profiles = profiles;
+    }
+
+    @Input
+    public String getProfiles() {
+        return this.profiles;
+    }
 
     @TaskAction
     void init() {

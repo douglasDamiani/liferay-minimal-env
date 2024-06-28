@@ -1,7 +1,7 @@
-apply from: 'gradle/crosig-docker-compose.gradle'
-
-apply plugin: "com.liferay.node"
-
 node {
 	nodeVersion = "16.15.1"
 }
+
+apply from: 'buildSrc/liferay-docker-compose.gradle'
+
+apply plugin: "com.liferay.node"
