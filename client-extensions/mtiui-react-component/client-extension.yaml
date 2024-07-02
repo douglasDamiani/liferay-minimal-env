@@ -1,0 +1,7 @@
+assemble:
+    - from: build/
+      into: static
+liferay-sample-global-js:
+    name: Liferay test Sample Global JS
+    type: globalJS
+    url: 'file.js'
