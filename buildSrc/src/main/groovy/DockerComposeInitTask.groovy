@@ -3,6 +3,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.Input
 
+import utils.Command
+
 class DockerComposeInitTask extends DefaultTask {
 
     private List<String> profiles = []
@@ -24,29 +26,11 @@ class DockerComposeInitTask extends DefaultTask {
 
         String springProjPath = "${project.rootDir}/client-extensions/task-manager-api"
         String dockerComposeFile = "${project.rootDir}/docker-compose.yaml"
+        def cmd = new Command()
 
-        executeCommand(['./gradlew', 'clean', 'deploy', 'createdockerfile'])
-        executeCommand(['docker', 'compose', "-f", dockerComposeFile, 'down', '-v'])
-        executeCommand(['docker', 'compose', "-f", dockerComposeFile, 'up', '-d', '--build', '-V', '--remove-orphans'])
+        cmd.execute(project, ['./gradlew', 'clean', 'deploy', 'createdockerfile'], getProfiles())
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'down', '-v'], getProfiles())
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'up', '-d', '--build', '-V', '--remove-orphans'], getProfiles())
     }
 
-    void executeCommand(List<String> commandLineContent, String setWorkingDir = null) {
-
-        def execResult = project.exec {
-            
-            workingDir = project.rootDir
-
-            if (setWorkingDir != null) {
-                workingDir setWorkingDir
-            }
-
-            environment 'COMPOSE_PROFILES', "${profiles.join(' ')}"
-
-            commandLine commandLineContent
-        }
-
-        if (execResult.exitValue != 0) {
-            throw new RuntimeException("Command failed: ${commandLine.join(' ')}")
-        }
-    }
 }

@@ -3,10 +3,9 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.text.SimpleDateFormat
 
+import utils.Command
 
 class GenerateDumpMySQL extends DefaultTask {
-    @Option(option = "profiles", description = "Docker compose profiles default value is spring")
-    List<String> profiles = []
 
     @TaskAction
     void init() {
@@ -19,54 +18,16 @@ class GenerateDumpMySQL extends DefaultTask {
 
         def formattedDate = dateFormat.format(currentDate)
 
-        def cmdResult = []
+        def cmd = new Command()
 
-        cmdResult << project.exec {
-            
-            def command = ['docker', 'compose', "-f", dockerComposeFile, 'exec', 'mysql', 'bash', '-c', "mysqldump -u root -prGC9rmmG --databases lportal > 01-crosig-dump-${formattedDate}.sql"]
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'exec', 'mysql', 'bash', '-c', "mysqldump -u root -prGC9rmmG --databases lportal > 01-crosig-dump-${formattedDate}.sql"])
 
-            commandLine command
-        }
+        cmd.execute(project, ["find", "$workingDir/docker/mysql/dump", "-type", "f", "-name", "*.sql", "-exec", "rm", "-f", "{}", ";" ])
 
-        cmdResult << project.exec {
-            
-            def command = ["find", "$workingDir/docker/mysql/dump", "-type", "f", "-name", "*.sql", "-exec", "rm", "-f", "{}", ";" ]
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'cp', "mysql:/01-crosig-dump-${formattedDate}.sql", "$workingDir/docker/mysql/dump/"])
 
-            commandLine command
-        }
+        cmd.execute(project, ["rm", "-rf", "$workingDir/configs/local/data/document_library"])
 
-        cmdResult << project.exec {
-            
-            def command = ['docker', 'compose', "-f", dockerComposeFile, 'cp', "mysql:/01-crosig-dump-${formattedDate}.sql", "$workingDir/docker/mysql/dump/"]
-
-            commandLine command
-        }
-
-        cmdResult << project.exec {
-            
-            def command = ["rm", "-rf", "$workingDir/configs/local/data/document_library"]
-
-            commandLine command
-        }
-
-
-        cmdResult << project.exec {
-            
-            def command = ['docker', 'compose', "-f", dockerComposeFile, 'cp', "liferay:/opt/liferay/data/document_library", "$workingDir/configs/local/data/"]
-
-            commandLine command
-        }
-
-        println cmdResult
-
-        cmdResult.each { value ->
-            if (value.exitValue != 0) {
-                throw new RuntimeException("Command failed: ${value.failure}")
-            }
-        }
-
-      
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'cp', "liferay:/opt/liferay/data/document_library", "$workingDir/configs/local/data/document_library"]) 
     }
-
-
 }

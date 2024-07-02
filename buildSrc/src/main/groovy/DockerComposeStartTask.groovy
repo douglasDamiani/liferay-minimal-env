@@ -3,9 +3,11 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.Input
 
+import utils.Command
+
 class DockerComposeStartTask extends DefaultTask {
 
-    List<String> profiles = []
+    private List<String> profiles = []
 
     @Option(option = "profiles", description = "Docker compose profiles default value is spring")
     public void setProfiles(List<String> profiles) {
@@ -13,7 +15,7 @@ class DockerComposeStartTask extends DefaultTask {
     }
 
     @Input
-    public String getProfiles() {
+    public List<String> getProfiles() {
         return this.profiles;
     }
 
@@ -21,22 +23,8 @@ class DockerComposeStartTask extends DefaultTask {
     void init() {
 
         String dockerComposeFile = "${project.rootDir}/docker-compose.yaml"
+        def cmd = new Command()
 
-        def execResult = project.exec {
-            
-            workingDir = project.rootDir
-
-            environment 'COMPOSE_PROFILES', "${profiles.join(' ')}"
-
-            def command = ['docker', 'compose', "-f", dockerComposeFile, 'start']
-
-            commandLine command
-        }
-
-        if (execResult.exitValue != 0) {
-            throw new RuntimeException("Command failed: ${commandLine.join(' ')}")
-        }
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'start'], getProfiles())
     }
-
-
 }
