@@ -20,11 +20,11 @@ class GenerateDumpMySQL extends DefaultTask {
 
         def cmd = new Command()
 
-        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'exec', 'mysql', 'bash', '-c', "mysqldump -u root -prGC9rmmG --databases lportal > 01-crosig-dump-${formattedDate}.sql"])
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'exec', 'mysql', 'bash', '-c', "mysqldump -u root -prGC9rmmG --databases lportal > 01-liferay-lite-dump-${formattedDate}.sql"])
 
         cmd.execute(project, ["find", "$workingDir/docker/mysql/dump", "-type", "f", "-name", "*.sql", "-exec", "rm", "-f", "{}", ";" ])
 
-        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'cp', "mysql:/01-crosig-dump-${formattedDate}.sql", "$workingDir/docker/mysql/dump/"])
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'cp', "mysql:/01-liferay-lite-dump-${formattedDate}.sql", "$workingDir/docker/mysql/dump/"])
 
         cmd.execute(project, ["rm", "-rf", "$workingDir/configs/local/data/document_library"])
 

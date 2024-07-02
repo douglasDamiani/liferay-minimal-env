@@ -2,38 +2,40 @@
 def currentProperties = loadLocalPropertiesIfExists()
 def currentProfiles = currentProperties.getProperty('dc.profiles')?.split(',') ?: [""]
 
+def taskGroup = 'Liferay Lite Docker Compose'
+
 tasks.register('dcinit', DockerComposeInitTask) { 
-    group = 'Liferay Lite Docker Compose'
+    group = taskGroup
     description = 'Build project and start and build Docker Compose.'
 	profiles = currentProfiles
 }
 
 tasks.register('dcup', DockerComposeUpTask) { 
-    group = 'Crosig Docker Compose'
+    group = taskGroup
     description = 'Run Docker Compose and Build Docker Images.'
 	profiles = currentProfiles
 }
 
 tasks.register('dcstart', DockerComposeStartTask) {
-    group = 'Crosig Docker Compose'
+    group = taskGroup
     description = 'Start Docker Compose Services.'
 	profiles = currentProfiles
 }
 
 tasks.register('dcstop', DockerComposeStopTask) { 
-    group = 'Crosig Docker Compose'
+    group = taskGroup
     description = 'Stop Docker Compose Services.'
 	profiles = currentProfiles
 }
 
 tasks.register('dcdown', DockerComposeDownTask) {
-    group = 'Crosig Docker Compose'
+    group = taskGroup
     description = 'Stop and Remove Docker Compose Containers.'
 	profiles = currentProfiles
 }
 
 tasks.register('createdump', GenerateDumpMySQL) {
-    group = 'Crosig Docker Compose'
+    group = taskGroup
     description = 'Remove old dump files and create a new one'
 }
 
