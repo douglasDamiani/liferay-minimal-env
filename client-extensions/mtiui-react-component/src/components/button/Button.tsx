@@ -1,7 +1,7 @@
 interface Props {
     value: string
 }
-function Title({ value }: Props) {
+function Button({ value }: Props) {
     return (
 
         <div className="border border-primary">
@@ -10,4 +10,4 @@ function Title({ value }: Props) {
 
     )
 }
-export default Title
+export default Button

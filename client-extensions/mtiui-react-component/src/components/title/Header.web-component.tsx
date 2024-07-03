@@ -1,15 +1,17 @@
-import Button from './Button';
+import Header from './Header';
 import { createRoot, Root } from 'react-dom/client';
-class ButtonWebComponent extends HTMLElement {
+class HeaderWebComponent extends HTMLElement {
     static get observedAttributes() {
-        return ['value']
+        return ['title', 'header', 'name']
     }
     mountPoint!: HTMLSpanElement;
     root!: Root;
     render() {
-        const title = this.getAttribute('value') || 'default';
+        const title = this.getAttribute('title') || 'child';
+        const header = this.getAttribute('header') || 'h5';
+        const name = this.getAttribute('name') || 'h5';
         if (!this.root) this.root = createRoot(this.mountPoint);
-        this.root.render(<Button value={title} />);
+        this.root.render(<Header header={header} title={title} name={name} />);
     }
     connectedCallback() {
         this.mountPoint = document.createElement('span');
@@ -21,5 +23,5 @@ class ButtonWebComponent extends HTMLElement {
         this.render();
     }
 }
-export default ButtonWebComponent;
-customElements.define('mtiui-button', ButtonWebComponent);
+export default HeaderWebComponent;
+customElements.define('webcompoent-title', HeaderWebComponent);

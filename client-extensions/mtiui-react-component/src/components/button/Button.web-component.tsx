@@ -1,16 +1,15 @@
-import Child from './Child';
+import Button from './Button';
 import { createRoot, Root } from 'react-dom/client';
-class ChildWebComponent extends HTMLElement {
+class ButtonWebComponent extends HTMLElement {
     static get observedAttributes() {
-        return ['title']
+        return ['value']
     }
     mountPoint!: HTMLSpanElement;
     root!: Root;
     render() {
-        const title = this.getAttribute('title') || 'child';
-        const troll = this.getAttribute('troll') || 'child';
+        const title = this.getAttribute('value') || 'default';
         if (!this.root) this.root = createRoot(this.mountPoint);
-        this.root.render(<Child troll={troll} title={title} />);
+        this.root.render(<Button value={title} />);
     }
     connectedCallback() {
         this.mountPoint = document.createElement('span');
@@ -22,5 +21,5 @@ class ChildWebComponent extends HTMLElement {
         this.render();
     }
 }
-export default ChildWebComponent;
-customElements.define('mtiui-child', ChildWebComponent);
+export default ButtonWebComponent;
+customElements.define('webcompoent-button', ButtonWebComponent);
