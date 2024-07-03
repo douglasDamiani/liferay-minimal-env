@@ -1,4 +1,4 @@
-import './App.css';
+// import './App.css';
 import React, { useRef, useState } from 'react';
 
 function App() {
@@ -8,10 +8,7 @@ function App() {
   
   return (
     <div className="app">
-      <h1>root</h1>
-      <input onChange={(e) => setTitle(e?.target?.value)} />
-      <button onClick={() => setShow(!show)}>Mostrar</button>
-      <react-child ref={reactChildRef} title={title}></react-child>
+      <h1>root ola</h1>
     </div>
   );
 }

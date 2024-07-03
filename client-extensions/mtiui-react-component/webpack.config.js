@@ -1,12 +1,12 @@
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
+import webpack from 'webpack';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default {
     mode: 'development',
-    // entry: './src/components/ChildWebComponent.tsx',
     entry: () => {
 
         const relativePath = './src/components/'
@@ -21,6 +21,12 @@ export default {
 
         return filesFiltered;
     },
+    devServer: {
+        headers: {
+			'Access-Control-Allow-Origin': '*',
+		},
+        hot: true,
+    },
     module: {
         rules: [
             {
@@ -34,7 +40,13 @@ export default {
         extensions: [".ts", ".tsx", ".js"],
     },
     output: {
-        path: path.resolve(__dirname, "build"),
-        filename: 'file.js',
+        path: path.resolve(__dirname, "build", 'static'),
+        filename: '[name].bundle.js',
+        clean: true,
     },
+    plugins: [
+		new webpack.optimize.LimitChunkCountPlugin({
+			maxChunks: 1,
+		}),
+	],
 }

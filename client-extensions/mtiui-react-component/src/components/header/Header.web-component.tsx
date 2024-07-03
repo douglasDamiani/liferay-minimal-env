@@ -1,12 +1,14 @@
-import Button from './Button';
+import Header from './Header';
 import { createRoot, Root } from 'react-dom/client';
-class ButtonWebComponent extends HTMLElement {
+
+
+class HeaderWebComponent extends HTMLElement {
+
     constructor(){
         super()
         console.log("ola");
         this.mountPoint = document.createElement('span');
         this.attachShadow({ mode: 'open' }).appendChild(this.mountPoint);
-        // this.render()
         
     }
     
@@ -23,7 +25,7 @@ class ButtonWebComponent extends HTMLElement {
         if (!this.root) 
             this.root = createRoot(this.mountPoint);
 
-        this.root.render(<Button value={title}/>);
+        this.root.render(<Header header={header} title={title} name={name} />);
     }
     connectedCallback() {
         this.render();
@@ -32,16 +34,15 @@ class ButtonWebComponent extends HTMLElement {
         this.render();
     }
 }
-export default ButtonWebComponent;
+export default HeaderWebComponent;
 
-const COMPONENT_NAME = 'webcompoent-button'
+const COMPONENT_NAME = 'webcomponent-title';
 
 if (customElements.get(COMPONENT_NAME)) {
-	// eslint-disable-next-line no-console
 	console.log(
-		'Skipping registration for <liferay-sample-custom-element-4> (already registered)'
+		'Skipping registration for ' + COMPONENT_NAME
 	);
 }
 else {
-	customElements.define(COMPONENT_NAME, ButtonWebComponent);
+	customElements.define(COMPONENT_NAME, HeaderWebComponent);
 }
