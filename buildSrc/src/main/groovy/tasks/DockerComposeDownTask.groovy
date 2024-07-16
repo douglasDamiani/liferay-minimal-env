@@ -1,3 +1,5 @@
+package com.liferayMinimalEnv.tasks
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
@@ -5,8 +7,7 @@ import org.gradle.api.tasks.Input
 
 import utils.Command
 
-class DockerComposeUpTask extends DefaultTask {
-
+class DockerComposeDownTask extends DefaultTask {
     private List<String> profiles = []
 
     @Option(option = "profiles", description = "Docker compose profiles default value is spring")
@@ -25,6 +26,6 @@ class DockerComposeUpTask extends DefaultTask {
         String dockerComposeFile = "${project.rootDir}/docker-compose.yaml"
         def cmd = new Command()
 
-        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'start'], getProfiles())
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'down', '-v'], getProfiles())
     }
 }

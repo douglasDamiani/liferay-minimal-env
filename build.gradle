@@ -2,6 +2,6 @@ node {
 	nodeVersion = "16.15.1"
 }
 
-apply from: 'buildSrc/liferay-docker-compose.gradle'
+apply plugin: 'com.liferayMinimalEnv.myplugin'
 
 apply plugin: "com.liferay.node"
