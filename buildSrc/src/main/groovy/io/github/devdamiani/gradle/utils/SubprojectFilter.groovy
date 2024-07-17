@@ -1,4 +1,4 @@
-package utils
+package io.github.devdamiani.gradle.utils
 
 import org.gradle.api.Project
 
@@ -7,7 +7,7 @@ class SubprojectFilter {
 
         project.subprojects { subproject ->
 
-            def files = fileTree(projectDir).matching{ exclude { details -> details.directory } }.files
+            def files = fileTree(subproject.projectDir).matching{ exclude { details -> details.directory } }.files
             def containsModuleFiles = files.find { file -> 
                 if(file.name.contains("package.json") || file.name.contains("client-extension.yaml") || file.name.contains("build.gradle") ) { 
                     return true

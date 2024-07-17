@@ -1,34 +1,24 @@
-package com.liferayMinimalEnv
+package io.github.devdamiani.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import utils.SubprojectFilter
-import com.liferayMinimalEnv.tasks.DockerComposeInitTask
-import com.liferayMinimalEnv.tasks.DockerComposeUpTask
-import com.liferayMinimalEnv.tasks.DockerComposeStartTask
-import com.liferayMinimalEnv.tasks.DockerComposeStopTask
-import com.liferayMinimalEnv.tasks.DockerComposeDownTask
-import com.liferayMinimalEnv.tasks.GenerateDumpMySQL
-import com.liferayMinimalEnv.tasks.DockerComposeDeploy
+import io.github.devdamiani.gradle.utils.SubprojectFilter
+import io.github.devdamiani.gradle.tasks.DockerComposeInitTask
+import io.github.devdamiani.gradle.tasks.DockerComposeUpTask
+import io.github.devdamiani.gradle.tasks.DockerComposeStartTask
+import io.github.devdamiani.gradle.tasks.DockerComposeStopTask
+import io.github.devdamiani.gradle.tasks.DockerComposeDownTask
+import io.github.devdamiani.gradle.tasks.GenerateDumpMySQL
+import io.github.devdamiani.gradle.tasks.DockerComposeDeploy
 
-import utils.CreateDockerFiles
 
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-
-class MyPlugin implements Plugin<Project> {
+class LiferayMinimalEnvPlugin implements Plugin<Project> {
 
     private def taskGroup = 'Liferay minimal environment - Docker Compose'
 
     @Override
     void apply(Project project) {
 
-        def resourceURL = this.getClass().getResource("/content")
-
-        println "url:${resourceURL}"
-
-        // CreateDockerFiles.createDockerFiles(project)
 
         def dcprofilesProperty = project.hasProperty('dc.profiles') ? project.property('dc.profiles') : ''
         def dcprofiles = dcprofilesProperty.tokenize()
@@ -76,23 +66,6 @@ class MyPlugin implements Plugin<Project> {
                 group = taskGroup
                 description = 'Deploy build files to the container.'
             }
-
-        }
-
-    }
-
-    static void copyDirectory(Path sourceDir, Path targetDir) {
-        try {
-            Files.walk(sourceDir)
-                 .filter { Files.isRegularFile(it) }
-                 .forEach { file ->
-                     Path targetFile = targetDir.resolve(sourceDir.relativize(file))
-                     Files.createDirectories(targetFile.getParent())
-                     Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
-                 }
-            println "Files copied successfully."
-        } catch (IOException e) {
-            println "Failed to copy files: ${e.message}"
         }
     }
 }

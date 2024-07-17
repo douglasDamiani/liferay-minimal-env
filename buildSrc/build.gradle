@@ -3,36 +3,32 @@
 plugins {
     id 'groovy'
     id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '1.2.1'
 }
 
 repositories {
     mavenCentral()
 }
 
-
 dependencies {
     implementation gradleApi()
-    implementation localGroovy()
 }
 
-version = '1.0.0'
-
-// sourceSets {
-//     main {
-//         groovy {
-//             srcDir 'src/main/groovy'
-//         }
-//         resources {
-//             srcDir 'src/main/resources'
-//         }
-//     }
-// }
+group = pluginGroupPackageName
+version = '0.7.0'
 
 gradlePlugin {
+    website = 'https://github.com/DevDamiani/liferay-minimal-env'
+    vcsUrl = 'https://github.com/DevDamiani/liferay-minimal-env.git'
+
     plugins {
-        create("myPlugin") {
-            id = 'com.liferayMinimalEnv.myplugin'
-            implementationClass = 'com.liferayMinimalEnv.MyPlugin'
+        create(pluginName) {
+            id = pluginId
+            displayName = pluginDisplayName
+            description = pluginDisplayDescription
+            tags.set(['liferay', 'dxp', 'docker', 'groovy'])
+            implementationClass = pluginImplementationClass
+
         }
     }
 }

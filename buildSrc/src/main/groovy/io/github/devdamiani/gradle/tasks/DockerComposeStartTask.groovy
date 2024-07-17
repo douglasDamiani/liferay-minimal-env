@@ -1,14 +1,13 @@
-package com.liferayMinimalEnv.tasks
+package io.github.devdamiani.gradle.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import org.gradle.api.tasks.Input
 
-import utils.Command
-import utils.CreateDockerFiles
+import io.github.devdamiani.gradle.utils.Command
 
-class DockerComposeInitTask extends DefaultTask {
+class DockerComposeStartTask extends DefaultTask {
 
     private List<String> profiles = []
 
@@ -25,16 +24,9 @@ class DockerComposeInitTask extends DefaultTask {
     @TaskAction
     void init() {
 
-        //  CreateDockerFiles.createDockerFiles(project)
-
-        println "profiles: ${getProfiles().join(' ')}"
-
         String dockerComposeFile = "${project.rootDir}/docker-compose.yaml"
         def cmd = new Command()
 
-        cmd.execute(project, ['./gradlew', 'clean', 'deploy', 'createdockerfile'], getProfiles())
-        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'down', '-v'], getProfiles())
-        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'up', '-d', '--build', '-V', '--remove-orphans'], getProfiles())
+        cmd.execute(project, ['docker', 'compose', "-f", dockerComposeFile, 'start'], getProfiles())
     }
-
 }

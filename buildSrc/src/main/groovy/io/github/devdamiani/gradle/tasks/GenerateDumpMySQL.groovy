@@ -1,11 +1,11 @@
-package com.liferayMinimalEnv.tasks
+package io.github.devdamiani.gradle.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.text.SimpleDateFormat
 
-import utils.Command
+import io.github.devdamiani.gradle.utils.Command
 
 class GenerateDumpMySQL extends DefaultTask {
 

@@ -1,4 +1,4 @@
-package utils
+package io.github.devdamiani.gradle.utils
 
 class Command {
     
